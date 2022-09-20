@@ -150,3 +150,15 @@ static/
 yatube/posts/static/
 yatube/media/
 
+#email tests to check if emulation works correctly
+.sent_emails/
+sent_emails/
+
+#Coverage
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover 
+
+media/

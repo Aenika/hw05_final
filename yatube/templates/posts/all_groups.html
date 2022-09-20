@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %} Все сообщества {% endblock %}
+{% block content %}
+<h1>Все сообщества </h1><p>
+  {% for group in groups %}
+    <ul>
+      <li>
+        <h3>Наименование: {{ group }}</h3>
+      </li>
+      <li>
+        Описание сообщества: {{ group.description }}
+      </li>
+      <li>
+        <a href="{% url 'posts:group_list' group.slug %}">Перейти к записям сообщества</a>
+      </li>
+    </ul>
+    {% if not forloop.last %}<hr>{% endif %}
+  {% endfor %}
+{% endblock %} 

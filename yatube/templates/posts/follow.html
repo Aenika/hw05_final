@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}Посты изранных авторов{% endblock %}
+{% block header %}Посты избранных авторов{% endblock %}
+{% block content %}
+  {% include 'includes/switcher.html' %}
+  {% for post in page_obj %}
+    {% include 'includes/post_form.html' %}
+    {% if not forloop.last %}<hr>{% endif %}
+  {% endfor %}
+  {% include 'includes/paginator.html' %}
+{% endblock %} 
