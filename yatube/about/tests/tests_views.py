@@ -1,5 +1,3 @@
-from http import HTTPStatus
-
 from django.test import Client, TestCase
 from django.urls import reverse
 
@@ -12,13 +10,6 @@ PAGES = {
 class StaticPagesURLTests(TestCase):
     def setUp(self):
         self.guest_client = Client()
-
-    def test_about_pages_accessible_by_name(self):
-        """URLs, генерируемые view классами author/, tech/, доступны."""
-        for page in PAGES.keys():
-            with self.subTest(page=page):
-                response = self.guest_client.get(page)
-                self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_urls_use_correct_templates(self):
         """Проверка шаблонов для view классов author/, tech/."""
