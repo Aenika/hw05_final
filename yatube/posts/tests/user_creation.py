@@ -5,14 +5,12 @@ import tempfile
 
 import django.test
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 
-from ..models import Comment, Group, Post
+from ..models import Comment, Group, Post, User
 
-User = get_user_model()
 
 TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
 

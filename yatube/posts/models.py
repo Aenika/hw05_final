@@ -1,9 +1,8 @@
-from django.contrib.auth import get_user_model
 from django.db import models
 
+from core.constants import SYMBOLS_FOR_PREVIEW
 from core.models import ModelWithDate
-
-User = get_user_model()
+from users.models import User
 
 
 class Group(models.Model):
@@ -12,7 +11,7 @@ class Group(models.Model):
     description = models.TextField(verbose_name='Описание')
 
     class Meta:
-        ordering = ["title"]
+        ordering = ("title",)
         verbose_name = 'Группа'
         verbose_name_plural = 'Группы'
 
@@ -49,15 +48,15 @@ class Post(ModelWithDate):
     )
 
     class Meta:
-        ordering = ["-pub_date"]
+        ordering = ("-pub_date",)
         verbose_name = 'Пост'
         verbose_name_plural = 'Посты'
 
     def __str__(self):
-        return self.text[:15]
+        return self.text[:SYMBOLS_FOR_PREVIEW]
 
 
-class Comment(ModelWithDate):
+class Comment(models.Model):
     post = models.ForeignKey(
         Post,
         on_delete=models.CASCADE,
@@ -74,11 +73,19 @@ class Comment(ModelWithDate):
         verbose_name='Текст комментария',
         help_text='Введите текст комментария'
     )
+    created = models.DateTimeField(
+        verbose_name='Дата публикации',
+        auto_now_add=True,
+        db_index=True
+    )
 
     class Meta:
-        ordering = ["pub_date"]
+        ordering = ("created",)
         verbose_name = 'Комментарий'
         verbose_name_plural = 'Комментарии'
+
+    def __str__(self):
+        return self.text[:SYMBOLS_FOR_PREVIEW]
 
 
 class Follow(models.Model):
@@ -94,3 +101,15 @@ class Follow(models.Model):
         related_name='following',
         verbose_name='Подписки',
     )
+
+    def __str__(self):
+        return f'Пользователь {self.user} подписан на автора {self.author}.'
+
+    class Meta:
+        verbose_name = 'Подписка'
+        verbose_name_plural = 'Подписки'
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "author"], name="unique_follow"
+            )
+        ]

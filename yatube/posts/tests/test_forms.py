@@ -3,15 +3,12 @@ import tempfile
 from http import HTTPStatus
 
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, override_settings
 from django.urls import reverse
 
-from ..models import Comment, Post
+from ..models import Comment, Post, User
 from .user_creation import UserCreateTest
-
-User = get_user_model()
 
 
 TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)

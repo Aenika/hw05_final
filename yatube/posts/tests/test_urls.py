@@ -14,11 +14,8 @@ class StaticURLTests(TestCase):
     """Первое, так называемое "дымовое", тестирование."""
     def test_homepage(self):
         guest_client = Client()
-        response = guest_client.get('/')
+        response = guest_client.get(reverse('posts:index'))
         self.assertEqual(response.status_code, HTTPStatus.OK)
-
-# Несуществующая страница выдает ошибку 404
-# и кастомный шаблон - в приложении core
 
 
 class PostURLTests(UserCreateTest):
@@ -40,10 +37,10 @@ class PostURLTests(UserCreateTest):
         post_id = post.id
         user = self.user
         PAGES = (
-            '/',
-            f'/group/{group.slug}/',
-            f'/profile/{user.username}/',
-            f'/posts/{post_id}/'
+            reverse('posts:index'),
+            reverse('posts:group_list', kwargs={'slug': f'{group.slug}'}),
+            reverse('posts:profile', kwargs={'username': f'{user.username}'}),
+            reverse('posts:post_detail', kwargs={'post_id': f'{post_id}'}),
         )
         for page in PAGES:
             with self.subTest(page=page):
@@ -56,7 +53,7 @@ class PostURLTests(UserCreateTest):
 
     def test_create_url_exists_at_desired_location(self):
         """Страница create/ доступна авторизованному пользователю."""
-        response = self.authorized_client.get('/create/')
+        response = self.authorized_client.get(reverse('posts:create_post'))
         self.assertEqual(
             response.status_code,
             HTTPStatus.OK,
@@ -71,7 +68,9 @@ class PostURLTests(UserCreateTest):
         )
         first_url = reverse('users:login')
         next_url = reverse('posts:create_post')
-        response = self.guest_client.get('/create/', follow=True)
+        response = self.guest_client.get(
+            reverse('posts:create_post'), follow=True
+        )
         self.assertRedirects(
             response,
             f'{first_url}?next={next_url}',
@@ -80,7 +79,10 @@ class PostURLTests(UserCreateTest):
 
     def test_edit_url_exists_at_desired_location(self):
         """Страница edit доступна автору поста."""
-        response = self.authorized_client.get(f'/posts/{self.post.id}/edit/')
+        post = self.post
+        response = self.authorized_client.get(
+            reverse('posts:post_edit', kwargs={'post_id': f'{post.id}'})
+        )
         self.assertEqual(
             response.status_code,
             HTTPStatus.OK,
@@ -91,7 +93,7 @@ class PostURLTests(UserCreateTest):
         """Страница edit не доступна Не-автору поста."""
         post = PostURLTests.post
         response = self.authorized_client.get(
-            f'/posts/{post.id}/edit/',
+            reverse('posts:post_edit', kwargs={'post_id': f'{post.id}'}),
             follow=True
         )
         self.assertRedirects(
@@ -107,12 +109,18 @@ class PostURLTests(UserCreateTest):
         post_id = post.id
         user = self.user
         PAGES_TEMPLATES_NAMES = {
-            '/': 'posts/index.html',
-            f'/group/{group.slug}/': 'posts/group_list.html',
-            f'/profile/{user.username}/': 'posts/profile.html',
-            f'/posts/{post_id}/': 'posts/post_detail.html',
-            '/create/': 'posts/create_post.html',
-            f'/posts/{post_id}/edit/': 'posts/create_post.html'
+            reverse('posts:index'):
+                'posts/index.html',
+            reverse('posts:group_list', kwargs={'slug': f'{group.slug}'}):
+                'posts/group_list.html',
+            reverse('posts:profile', kwargs={'username': f'{user.username}'}):
+                'posts/profile.html',
+            reverse('posts:post_detail', kwargs={'post_id': f'{post_id}'}):
+                'posts/post_detail.html',
+            reverse('posts:create_post'):
+                'posts/create_post.html',
+            reverse('posts:post_edit', kwargs={'post_id': f'{post.id}'}):
+                'posts/create_post.html'
         }
         for page, template in PAGES_TEMPLATES_NAMES.items():
             with self.subTest(page=page):

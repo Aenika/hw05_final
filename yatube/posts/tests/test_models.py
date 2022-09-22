@@ -1,9 +1,7 @@
-from django.contrib.auth import get_user_model
 from django.test import TestCase
 
-from ..models import Group, Post
-
-User = get_user_model()
+from core.constants import SYMBOLS_FOR_PREVIEW
+from ..models import Group, Post, User
 
 
 class PostModelTest(TestCase):
@@ -73,7 +71,7 @@ class PostModelTest(TestCase):
         group = PostModelTest.group
         group_title = group.title
         post = PostModelTest.post
-        post_title = post.text[:15]
+        post_title = post.text[:SYMBOLS_FOR_PREVIEW]
         EXPECTED_VALUE = {
             group: group_title,
             post: post_title

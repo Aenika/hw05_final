@@ -15,13 +15,13 @@
           </li>
         {% endif %} 
         <li class="list-group-item">
-          Автор: {{ post.author.get_full_name }}
+          Автор: {{ author.get_full_name }}
         </li>
         <li class="list-group-item d-flex justify-content-between align-items-center">
-          Всего постов автора:  {{ number_of_posts }}
+          Всего постов автора:  {{ author.posts.count }}
         </li>
         <li class="list-group-item">
-          <a href="{% url 'posts:profile' post.author %}">
+          <a href="{% url 'posts:profile' author %}">
             Все посты пользователя
           </a>
         </li>
@@ -34,7 +34,7 @@
       <p>
         {{ post.text }}
       </p>
-      {% if user.id == post.author.id %}
+      {% if user.id == author.id %}
         <a class="btn btn-primary" href="{% url 'posts:post_edit' post.id %}">
           Редактировать запись
         </a> 

@@ -1,6 +1,4 @@
 from django import forms
-from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.core.paginator import Page
 from django.db.models.fields.files import ImageFieldFile
@@ -8,14 +6,10 @@ from django.db.models.query import QuerySet
 from django.test import Client
 from django.urls import reverse
 
+from core.constants import POSTS_FOR_PAGINATOR_TESTING, POSTS_PER_PAGE
 from ..forms import CommentForm
-from ..models import Follow, Group, Post
+from ..models import Follow, Group, Post, User
 from .user_creation import UserCreateTest
-
-User = get_user_model()
-
-POSTS_PER_PAGE = settings.POSTS_PER_PAGE
-POSTS_FOR_PAGINATOR_TESTING = 13
 
 
 class PagesTemplatesTests(UserCreateTest):
@@ -65,9 +59,7 @@ class TestingPaginator(UserCreateTest):
 
     def test_first_page_contain_expected_number_records_and_class_page(self):
         """Проверка паджинатора и использования класса Page в контексте."""
-        number_of_posts = len(Post.objects.all())
-        # так как в родительском классе создавался тестовый пост,
-        # число постов не совпадает с len(self.posts_for_test)
+        number_of_posts = Post.objects.count()
         posts_on_second_page = number_of_posts - POSTS_PER_PAGE
         for page in self.pages:
             with self.subTest(page=page):
@@ -153,9 +145,6 @@ class PostsPagesTests(UserCreateTest):
         self.assertEqual(post_text, 'Лалала' * 5)
         self.assertIsInstance(form_in_response, CommentForm)
 
-    # То, что в контексте есть Page
-    # протестировано вместе с паджинатором
-
     def test_group_list_uses_correct_context(self):
         """Шаблон group_list сформирован с правильным контекстом."""
         group = self.group
@@ -227,7 +216,6 @@ class PostsOnCreationTest(UserCreateTest):
 
     def test_not_in_unrelated_group(self):
         """Проверяем, что поста нет в группе, к которой он не относится."""
-        # Пост относится к группе self.group
         post = self.post
         group = self.group1
         response = self.client.get(reverse(

@@ -1,8 +1,8 @@
-from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, redirect, render
 
+from core.constants import POSTS_PER_PAGE
 from .forms import CommentForm, PostForm
 from .models import Comment, Follow, Group, Post, User
 
@@ -14,12 +14,9 @@ def paginising(post_list, posts_per_page, request):
     return page_obj
 
 
-# @cache_page(20, key_prefix='index_page')
-# - кэшируются данные о том, что пользователь
-# не авторизирован. Перенесла кэш в шаблон
 def index(request):
     post_list = Post.objects.select_related("author")
-    page_obj = paginising(post_list, settings.POSTS_PER_PAGE, request)
+    page_obj = paginising(post_list, POSTS_PER_PAGE, request)
     context = {
         'page_obj': page_obj
     }
@@ -29,7 +26,7 @@ def index(request):
 def group_posts(request, slug):
     group = get_object_or_404(Group, slug=slug)
     posts = Post.objects.select_related('group').filter(group=group)
-    page_obj = paginising(posts, settings.POSTS_PER_PAGE, request)
+    page_obj = paginising(posts, POSTS_PER_PAGE, request)
     context = {
         'group': group,
         'page_obj': page_obj,
@@ -48,7 +45,7 @@ def profile(request, username):
     posts_by_author = Post.objects.select_related('author').filter(
         author=author
     )
-    page_obj = paginising(posts_by_author, settings.POSTS_PER_PAGE, request)
+    page_obj = paginising(posts_by_author, POSTS_PER_PAGE, request)
     following = (
         request.user.is_authenticated
         and request.user != author
@@ -66,13 +63,10 @@ def profile(request, username):
 def post_detail(request, post_id):
     post = Post.objects.get(id=post_id)
     author = post.author
-    username = author.username
-    number_of_posts = author.posts.count()
     comments = Comment.objects.select_related('post').filter(post=post)
     context = {
         'post': post,
-        'number_of_posts': number_of_posts,
-        'username': username,
+        'author': author,
         'form': CommentForm(),
         'comments': comments
     }
@@ -131,7 +125,7 @@ def follow_index(request):
     posts = Post.objects.select_related('author').filter(
         author__following__user=request.user
     )
-    page_obj = paginising(posts, settings.POSTS_PER_PAGE, request)
+    page_obj = paginising(posts, POSTS_PER_PAGE, request)
     context = {'page_obj': page_obj}
     return render(request, 'posts/follow.html', context)
 
