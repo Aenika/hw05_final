@@ -53,7 +53,6 @@ def profile(request, username):
     )
     context = {
         'author': author,
-        'posts_by_author': posts_by_author,
         'page_obj': page_obj,
         'following': following
     }
