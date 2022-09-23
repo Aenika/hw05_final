@@ -161,11 +161,7 @@ class PostsPagesTests(UserCreateTest):
             'posts:profile', kwargs={'username': f'{user.username}'}
         ))
         context = response.context['author']
-        context2 = response.context['posts_by_author']
-        posts_count = user.posts.count()
         self.assertIsInstance(context, User)
-        self.assertIsInstance(context2, QuerySet)
-        self.assertEqual(len(context2), posts_count)
 
     def test_pages_show_correct_context_for_post(self):
         """Шаблоны сформированы с правильным контекстом(содержание Post)."""
